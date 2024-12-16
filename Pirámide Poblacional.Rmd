@@ -1,0 +1,11 @@
+---
+title: "Pirámide Poblacional"
+author: "Miguel Herreros"
+date: "2024-12-16"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
