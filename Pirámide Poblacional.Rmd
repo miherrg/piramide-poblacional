@@ -29,7 +29,7 @@ En esta práctica vamos a tratar la visualización de datos siguiendo como ejemp
 
 ```{r}
 # Creación de un conjunto de datos de ejemplo
-data <- data.frame(
+data <- data.table(
   Edad = c("0-4", "5-9", "10-14", "15-19", "20-24"),
   Hombres = c(100, 120, 90, 80, 60),
   Mujeres = c(95, 110, 85, 75, 55)
@@ -64,3 +64,47 @@ p <- ggplot(data, aes(y = Edad)) +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 p
 ```
+
+# Reordenando los grupos de edad.
+
+Tal y como está en el `data.table`, los grupos de edad son cadenas y, por tanto, las ordena lexicográficamente. Sin embargo eso no tiene mucho sentido pues el grupo de $5-9$ años no debería ser el mayor. El paquete `stringr` nos permite crear una columna con el orden de las cadenas pero ordenadas numéricamente en lugar de lexicográficamente.
+
+```{r}
+data[, order:= str_order(x = Edad, numeric = TRUE)]
+```
+
+Con esta nueva columna podemos ordenar correctamente los grupos de edad.
+```{r}
+p <- ggplot(data, aes(y = order)) +
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity") +
+  scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink")) +
+  labs(title = "Pirámide de Población", x = "", y = "Grupo de Edad") +
+  theme_minimal() +
+  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20), labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
+  geom_text(aes(y = order, x = 0, label = Edad), hjust = 0.5, vjust = 0) +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+p
+```
+Como podemos ver, ggplot no está terminando de interpretar bien lo que queremos mostrar. Si quitamos las modificaciones que hemos hecho al gráfico y dejamos los valores por defecto se puede ver bien qué está sucediendo.
+```{r}
+p <- ggplot(data, aes(y = order)) +
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity")
+p
+```
+Como podemos ver, al ser `order` una variable numérica nos está haciendo un histograma al uso, con las barras subiendo desde el eje x hasta el valor del "orden" en el eje y. Esto se soluciona fácilmente si simplemente especificamos a R que la variable `order` es categórica.
+```{r}
+data[, order:= as.factor(order)]
+p <- ggplot(data, aes(y = order)) +
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity") +
+  scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink")) +
+  labs(title = "Pirámide de Población", x = "", y = "Grupo de Edad") +
+  theme_minimal() +
+  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20), labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
+  geom_text(aes(y = order, x = 0, label = Edad), hjust = 0.5, vjust = 0) +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
+p
+```
+
