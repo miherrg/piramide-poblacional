@@ -1,5 +1,4 @@
 library(ggplot2)
-
 # Creación de un conjunto de datos de ejemplo
 data <- data.frame(
   Edad = c("0-4", "5-9", "10-14", "15-19", "20-24"),
