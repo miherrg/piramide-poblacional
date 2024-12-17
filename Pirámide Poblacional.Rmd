@@ -6,18 +6,18 @@ output:
   pdf_document:
     extra_dependencies:
       babel: ["spanish"]
-      hyperref
-      graphicx
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-```{r}
+```{r, include=FALSE}
 library(ggplot2)
 library(data.table)
 library(stringr)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(dev = "cairo_pdf") 
+#Permite a knitr acceder a los tipos de letra del sistema para los gráficos
 ```
 
 \maketitle
@@ -38,12 +38,15 @@ data <- data.table(
 
 # Creación de la pirámide de población
 p <- ggplot(data, aes(y = Edad)) +
-  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
-  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity") +
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", 
+           position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", 
+           position = "identity") +
   scale_fill_manual(values = c("Hombres" = "blue", "Mujeres" = "pink")) +
   labs(title = "Pirámide de Población", x = "", y = "Grupo de Edad") +
   theme_minimal() +
-  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20), labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
+  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20),
+                     labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
   geom_text(aes(y = Edad, x = 0, label = Edad), hjust = 0.5, vjust = 0) +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 p
@@ -55,12 +58,16 @@ A primera vista lo que más me llama la atención es el poco contraste que hay e
 
 ```{r}
 p <- ggplot(data, aes(y = Edad)) +
-  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
-  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity") +
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity",
+           position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", 
+           position = "identity") +
   scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink")) +
   labs(title = "Pirámide de Población", x = "", y = "Grupo de Edad") +
   theme_minimal() +
-  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20), labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
+  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20),
+                     labels = abs(seq(-max(data$Mujeres), max(data$Hombres), 
+                                      by = 20))) +
   geom_text(aes(y = Edad, x = 0, label = Edad), hjust = 0.5, vjust = 0) +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 p
@@ -78,12 +85,16 @@ Con esta nueva columna podemos ordenar correctamente los grupos de edad.
 
 ```{r}
 p <- ggplot(data, aes(y = order)) +
-  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
-  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity") +
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", 
+           position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", 
+           position = "identity") +
   scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink")) +
   labs(title = "Pirámide de Población", x = "", y = "Grupo de Edad") +
   theme_minimal() +
-  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20), labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
+  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20),
+                     labels = abs(seq(-max(data$Mujeres), max(data$Hombres), 
+                                      by = 20))) +
   geom_text(aes(y = order, x = 0, label = Edad), hjust = 0.5, vjust = 0) +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 p
@@ -93,8 +104,10 @@ Como podemos ver, ggplot no está terminando de interpretar bien lo que queremos
 
 ```{r}
 p <- ggplot(data, aes(y = order)) +
-  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
-  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity")
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", 
+           position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", 
+           position = "identity")
 p
 ```
 
@@ -103,12 +116,16 @@ Como podemos ver, al ser `order` una variable numérica nos está haciendo un hi
 ```{r}
 data[, order:= as.factor(order)]
 p <- ggplot(data, aes(y = order)) +
-  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
-  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity") +
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", 
+           position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", 
+           position = "identity") +
   scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink")) +
   labs(title = "Pirámide de Población", x = "", y = "Grupo de Edad") +
   theme_minimal() +
-  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20), labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
+  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20),
+                     labels = abs(seq(-max(data$Mujeres), max(data$Hombres), 
+                                      by = 20))) +
   geom_text(aes(y = order, x = 0, label = Edad), hjust = 0.5, vjust = 0) +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 p
@@ -124,18 +141,28 @@ Además, también se ha añadido un título descriptivo a la leyenda y al eje x 
 total_population = sum(data[, Hombres]) + sum(data[, Mujeres])
 data[, ratiosHombres := Hombres / total_population]
 data[, ratiosMujeres := Mujeres / total_population]
-data[, percentHombres := paste(as.character(round(ratiosHombres*100, digits = 2)), "%")]
-data[, percentMujeres := paste(as.character(round(ratiosMujeres*100, digits = 2)), "%")]
+data[, percentHombres := 
+       paste(as.character(round(ratiosHombres*100, digits = 2)), "%")]
+data[, percentMujeres := 
+       paste(as.character(round(ratiosMujeres*100, digits = 2)), "%")]
 p <- ggplot(data, aes(y = order)) +
-  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
-  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity") +
-  scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink"), name="Género") +
-  labs(title = "Pirámide de Población por Género", x = "Número de personas", y = "Grupo de Edad") +
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", 
+           position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", 
+           position = "identity") +
+  scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink"),
+                    name="Género") +
+  labs(title = "Pirámide de Población por Género", x = "Número de personas", 
+       y = "Grupo de Edad") +
   theme_minimal() +
-  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20), labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
+  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20),
+                     labels = abs(seq(-max(data$Mujeres), max(data$Hombres), 
+                                      by = 20))) +
   scale_y_discrete(breaks = data$order, labels = data$Edad) +
-  geom_text(aes(y = order, x = Hombres -15, label = percentHombres), hjust = 0.5, vjust = 0.5, size = 3) + 
-  geom_text(aes(y = order, x = -Mujeres + 15, label = percentMujeres), hjust = 0.5, vjust = 0.5, size = 3)
+  geom_text(aes(y = order, x = Hombres -15, label = percentHombres), 
+            hjust = 0.5, vjust = 0.5, size = 3) + 
+  geom_text(aes(y = order, x = -Mujeres + 15, label = percentMujeres), 
+            hjust = 0.5, vjust = 0.5, size = 3)
   
 p
 ```
@@ -154,15 +181,24 @@ Para que una persona con dislexia tenga las menores dificultades posibles para l
 
 ```{r}
 p <- ggplot(data, aes(y = order)) +
-  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
-  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity") +
-  scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink"), name="Género") +
-  labs(title = "Pirámide de Población por Género", x = "Número de personas", y = "Grupo de Edad") +
-  theme_minimal() + theme(text = element_text(family = "Comic Neue")) +
-  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20), labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", 
+           position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", 
+           position = "identity") +
+  scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink"),
+                    name="Género") +
+  labs(title = "Pirámide de Población por Género", x = "Número de personas", 
+       y = "Grupo de Edad") +
+  theme_minimal() + 
+  theme(text = element_text(family = "Comic Neue")) +
+  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20),
+                     labels = abs(seq(-max(data$Mujeres), max(data$Hombres), 
+                                      by = 20))) +
   scale_y_discrete(breaks = data$order, labels = data$Edad) +
-  geom_text(aes(y = order, x = Hombres -15, label = percentHombres), hjust = 0.5, vjust = 0.5, size = 3) + 
-  geom_text(aes(y = order, x = -Mujeres + 15, label = percentMujeres), hjust = 0.5, vjust = 0.5, size = 3)
+  geom_text(aes(y = order, x = Hombres -15, label = percentHombres), 
+            hjust = 0.5, vjust = 0.5, size = 3) + 
+  geom_text(aes(y = order, x = -Mujeres + 15, label = percentMujeres), 
+            hjust = 0.5, vjust = 0.5, size = 3)
   
 p
 ```
