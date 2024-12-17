@@ -74,6 +74,7 @@ data[, order:= str_order(x = Edad, numeric = TRUE)]
 ```
 
 Con esta nueva columna podemos ordenar correctamente los grupos de edad.
+
 ```{r}
 p <- ggplot(data, aes(y = order)) +
   geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
@@ -86,14 +87,18 @@ p <- ggplot(data, aes(y = order)) +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
 p
 ```
+
 Como podemos ver, ggplot no está terminando de interpretar bien lo que queremos mostrar. Si quitamos las modificaciones que hemos hecho al gráfico y dejamos los valores por defecto se puede ver bien qué está sucediendo.
+
 ```{r}
 p <- ggplot(data, aes(y = order)) +
   geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
   geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity")
 p
 ```
+
 Como podemos ver, al ser `order` una variable numérica nos está haciendo un histograma al uso, con las barras subiendo desde el eje x hasta el valor del "orden" en el eje y. Esto se soluciona fácilmente si simplemente especificamos a R que la variable `order` es categórica.
+
 ```{r}
 data[, order:= as.factor(order)]
 p <- ggplot(data, aes(y = order)) +
@@ -108,3 +113,28 @@ p <- ggplot(data, aes(y = order)) +
 p
 ```
 
+# Retocando Ejes
+
+El rango de las edades no hace falta tenerlo en el gráfico, es muy fácil de ver si las etiquetas están en el eje y, dejando así espacio en el gráfico para etiquetar cada grupo con otro tipo de información que pueda ser útil. Por ejemplo, el porcentaje de personas de cada género en cada grupo.
+
+Además, también se ha añadido un título descriptivo a la leyenda.
+
+```{r}
+total_population = sum(data[, Hombres]) + sum(data[, Mujeres])
+data[, ratiosHombres := Hombres / total_population]
+data[, ratiosMujeres := Mujeres / total_population]
+data[, percentHombres := paste(as.character(round(ratiosHombres*100, digits = 2)), "%")]
+data[, percentMujeres := paste(as.character(round(ratiosMujeres*100, digits = 2)), "%")]
+p <- ggplot(data, aes(y = order)) +
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity") +
+  scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink"), name="Género") +
+  labs(title = "Pirámide de Población por Género", x = "Número de personas", y = "Grupo de Edad") +
+  theme_minimal() +
+  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20), labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
+  scale_y_discrete(breaks = data$order, labels = data$Edad) +
+  geom_text(aes(y = order, x = Hombres -15, label = percentHombres), hjust = 0.5, vjust = 0.5, size = 3) + 
+  geom_text(aes(y = order, x = -Mujeres + 15, label = percentMujeres), hjust = 0.5, vjust = 0.5, size = 3)
+  
+p
+```
