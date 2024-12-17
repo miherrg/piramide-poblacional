@@ -6,6 +6,7 @@ output:
   pdf_document:
     extra_dependencies:
       babel: ["spanish"]
+      hyperref: []
 ---
 
 ```{r, include=FALSE}
@@ -133,6 +134,8 @@ p
 
 # Retocando Ejes
 
+\label{retocandoEjes}
+
 El rango de las edades no hace falta tenerlo en el gráfico, es muy fácil de ver si las etiquetas están en el eje y, dejando así espacio en el gráfico para etiquetar cada grupo con otro tipo de información que pueda ser útil. Por ejemplo, el porcentaje de personas de cada género en cada grupo.
 
 Además, también se ha añadido un título descriptivo a la leyenda y al eje x y se ha modificado el título del gráfico.
@@ -198,6 +201,66 @@ p <- ggplot(data, aes(y = order)) +
   geom_text(aes(y = order, x = Hombres -15, label = percentHombres), 
             hjust = 0.5, vjust = 0.5, size = 3) + 
   geom_text(aes(y = order, x = -Mujeres + 15, label = percentMujeres), 
+            hjust = 0.5, vjust = 0.5, size = 3)
+  
+p
+```
+
+# Corrección de clase
+
+## Escalas del eje x.
+
+Tal y como se ha comentado en clase, la idea de representar a la vez el número absoluto de personas y su proporción puede llegar a ser confuso. De hecho, es una estrategia habitualmente usada para [distorsionar la realidad](https://www.cbsnews.com/news/how-purdue-used-misleading-charts-to-hide-oxycontins-addictive-power/). Para evitar confusiones, cambiamos el eje x.
+
+```{r}
+rango = seq(-14,14, by = 2)
+labelsRango = paste(abs(rango), "%", sep = "")
+p <- ggplot(data, aes(y = order)) +
+  geom_bar(aes(x = 100*ratiosHombres, fill = "Hombres"), stat = "identity", 
+           position = "identity") +
+  geom_bar(aes(x = -100*ratiosMujeres, fill = "Mujeres"), stat = "identity", 
+           position = "identity") +
+  scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink"),
+                    name="Género") +
+  labs(title = "Pirámide de Población por Género", x = "Número de personas", 
+       y = "Grupo de Edad") +
+  theme_minimal() + 
+  theme(text = element_text(family = "Comic Neue")) +
+  scale_x_continuous(breaks = rango,
+                     labels = labelsRango) +
+  scale_y_discrete(breaks = data$order, labels = data$Edad) +
+  geom_text(aes(y = order, x = 100*ratiosHombres-1.5, label = percentHombres), 
+            hjust = 0.5, vjust = 0.5, size = 3) + 
+  geom_text(aes(y = order, x = -100*ratiosMujeres+1.5, label = percentMujeres), 
+            hjust = 0.5, vjust = 0.5, size = 3)
+  
+p
+```
+
+## Añadir pie de gráfico.
+
+Además también se ha comentado la necesidad de, en un caso real, mostrar la fuente de los datos.
+
+```{r}
+rango = seq(-14,14, by = 2)
+labelsRango = paste(abs(rango), "%", sep = "")
+p <- ggplot(data, aes(y = order)) +
+  geom_bar(aes(x = 100*ratiosHombres, fill = "Hombres"), stat = "identity", 
+           position = "identity") +
+  geom_bar(aes(x = -100*ratiosMujeres, fill = "Mujeres"), stat = "identity", 
+           position = "identity") +
+  scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink"),
+                    name="Género") +
+  labs(title = "Pirámide de Población por Género", x = "Número de personas", 
+       y = "Grupo de Edad", caption = "Fuente: Datos de ejemplo para el trabajo.") +
+  theme_minimal() + 
+  theme(text = element_text(family = "Comic Neue")) +
+  scale_x_continuous(breaks = rango,
+                     labels = labelsRango) +
+  scale_y_discrete(breaks = data$order, labels = data$Edad) +
+  geom_text(aes(y = order, x = 100*ratiosHombres-1.5, label = percentHombres), 
+            hjust = 0.5, vjust = 0.5, size = 3) + 
+  geom_text(aes(y = order, x = -100*ratiosMujeres+1.5, label = percentMujeres), 
             hjust = 0.5, vjust = 0.5, size = 3)
   
 p
