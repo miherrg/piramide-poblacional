@@ -7,6 +7,7 @@ output:
     extra_dependencies:
       babel: ["spanish"]
       hyperref
+      graphicx
 ---
 
 ```{r setup, include=FALSE}
@@ -117,7 +118,7 @@ p
 
 El rango de las edades no hace falta tenerlo en el gráfico, es muy fácil de ver si las etiquetas están en el eje y, dejando así espacio en el gráfico para etiquetar cada grupo con otro tipo de información que pueda ser útil. Por ejemplo, el porcentaje de personas de cada género en cada grupo.
 
-Además, también se ha añadido un título descriptivo a la leyenda.
+Además, también se ha añadido un título descriptivo a la leyenda y al eje x y se ha modificado el título del gráfico.
 
 ```{r}
 total_population = sum(data[, Hombres]) + sum(data[, Mujeres])
@@ -131,6 +132,33 @@ p <- ggplot(data, aes(y = order)) +
   scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink"), name="Género") +
   labs(title = "Pirámide de Población por Género", x = "Número de personas", y = "Grupo de Edad") +
   theme_minimal() +
+  scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20), labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
+  scale_y_discrete(breaks = data$order, labels = data$Edad) +
+  geom_text(aes(y = order, x = Hombres -15, label = percentHombres), hjust = 0.5, vjust = 0.5, size = 3) + 
+  geom_text(aes(y = order, x = -Mujeres + 15, label = percentMujeres), hjust = 0.5, vjust = 0.5, size = 3)
+  
+p
+```
+
+# Accesibilidad
+
+Por último se va a estudiar el modificar los colores del gráfico y el tipo de letra, con el objetivo de hacer más accesible el gráfico.
+
+## Daltonismo
+
+Resulta que, tras comprobar diversas paletas de colores en [Coblis](https://www.color-blindness.com/coblis-color-blindness-simulator/), la paleta de colores escogida ya es muy robusa ante los ocho tipos de daltonismo que te permite comprobar la web. Luego en este aspecto no hace falta cambiar nada.
+
+## Dislexia
+
+Para que una persona con dislexia tenga las menores dificultades posibles para leer correctamente un texto se suelen exigir tres condiciones. Que no tengan serifas, que el texto sea monoespaciado y que no sea un tipo de letra cursiva u oblicua. Pese a la mala fama que suele tener, Comic Sans cumple las tres condiciones anteriores y es de las más legibles para personas con dislexia. Sin embargo, al formar parte de los tipos de letra propietarios de Microsoft, usaremos Comic Neue, una fuente inspirada en Comic Sans y con las mismas virtudes pero que busca ser menos "infantil" que la primera. Además de estar disponible en Linux.
+
+```{r}
+p <- ggplot(data, aes(y = order)) +
+  geom_bar(aes(x = Hombres, fill = "Hombres"), stat = "identity", position = "identity") +
+  geom_bar(aes(x = -Mujeres, fill = "Mujeres"), stat = "identity", position = "identity") +
+  scale_fill_manual(values = c("Hombres" = "skyblue", "Mujeres" = "pink"), name="Género") +
+  labs(title = "Pirámide de Población por Género", x = "Número de personas", y = "Grupo de Edad") +
+  theme_minimal() + theme(text = element_text(family = "Comic Neue")) +
   scale_x_continuous(breaks = seq(-max(data$Mujeres), max(data$Hombres), by = 20), labels = abs(seq(-max(data$Mujeres), max(data$Hombres), by = 20))) +
   scale_y_discrete(breaks = data$order, labels = data$Edad) +
   geom_text(aes(y = order, x = Hombres -15, label = percentHombres), hjust = 0.5, vjust = 0.5, size = 3) + 
